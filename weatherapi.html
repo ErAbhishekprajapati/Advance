@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalFarmers - Weather Updates</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --secondary-color: #ffc107;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+        }
+        
+        .weather-section {
+            background-color: var(--light-color);
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            color: var(--dark-color);
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, var(--primary-color), #72b626);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .weather-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .weather-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .temp-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .weather-details {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .weather-details li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .weather-details i {
+            width: 25px;
+            margin-right: 10px;
+            opacity: 0.8;
+        }
+        
+        .location-select .form-select {
+            border-radius: 50px;
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .location-select label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+        
+        .update-time {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .advisory-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        
+        .advisory-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .advisory-item {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .advisory-item i {
+            position: absolute;
+            left: 0;
+            top: 3px;
+        }
+        
+        .forecast-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .forecast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .forecast-day {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .forecast-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .forecast-temp {
+            font-size: 1.1rem;
+        }
+        
+        .forecast-temp-high {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .forecast-temp-low {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        
+        .forecast-icon {
+            font-size: 1.8rem;
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+        
+        .weather-alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 767.98px) {
+            .weather-section {
+                padding: 50px 0;
+            }
+            
+            .temp-display {
+                font-size: 2.5rem;
+            }
+            
+            .weather-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Weather Section -->
+    <section class="weather-section">
+        <div class="container">
+            <h2 class="section-title text-center fw-bold">Farm Weather Updates</h2>
+            
+            <div class="row g-4">
+                <!-- Current Weather Column -->
+                <div class="col-lg-6">
+                    <div class="location-select">
+                        <label for="citySelect" class="form-label">Select Farm Location:</label>
+                        <select class="form-select" id="citySelect">
+                            <option value="Delhi">Delhi</option>
+                            <option value="Noida">Noida</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Allahabad">Prayagraj</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Bangalore">Bangalore</option>
+                            <option value="Hyderabad">Hyderabad</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Kolkata">Kolkata</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Jaipur">Jaipur</option>
+                        </select>
+                    </div>
+                    
+                    <div class="weather-card">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h3 id="locationName" class="mb-1">Delhi</h3>
+                                <p id="weatherDate" class="mb-0 small"></p>
+                            </div>
+                            <div class="update-time">
+                                <i class="fas fa-sync-alt me-1"></i>
+                                <span id="updateTime"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-center">
+                                <div class="weather-icon">
+                                    <i id="weatherIcon" class="fas fa-sun"></i>
+                                </div>
+                                <div id="weatherDesc" class="text-capitalize fw-medium">Sunny</div>
+                            </div>
+                            <div class="temp-display text-end">
+                                <span id="temperature">32</span>°C
+                                <div class="fs-6 fw-normal">
+                                    Feels like <span id="feelsLike">34</span>°C
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+                        
+                        <ul class="weather-details">
+                            <li>
+                                <i class="fas fa-tint"></i>
+                                <span>Humidity: <span id="humidity">45</span>%</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-wind"></i>
+                                <span>Wind: <span id="windSpeed">12</span> km/h</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-compress-alt"></i>
+                                <span>Pressure: <span id="pressure">1012</span> hPa</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-eye"></i>
+                                <span>Visibility: <span id="visibility">10</span> km</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Advisory and Forecast Column -->
+                <div class="col-lg-6">
+                    <!-- Weather Alert (conditionally shown) -->
+                    <div id="weatherAlert" class="weather-alert d-none">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle text-warning me-3 fs-4"></i>
+                            <div>
+                                <h5 class="mb-1" id="alertTitle">Weather Alert</h5>
+                                <p class="mb-0" id="alertMessage">Heavy rainfall expected in your area tomorrow.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="advisory-card">
+                        <h4 class="advisory-title">
+                            <i class="fas fa-info-circle me-2"></i>Farm Weather Advisory
+                        </h4>
+                        
+                        <div id="weatherAdvice">
+                            <div class="advisory-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <p class="mb-0">Good day for irrigation and fertilization</p>
+                            </div>
+                            <div class="advisory-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <p class="mb-0">Ideal conditions for harvesting</p>
+                            </div>
+                            <div class="advisory-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <p class="mb-0">Suitable for outdoor farm activities</p>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h4 class="advisory-title">
+                            <i class="fas fa-calendar-alt me-2"></i>7-Day Forecast
+                        </h4>
+                        
+                        <div class="row g-3" id="forecastContainer">
+                            <!-- Forecast items will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Weather API Script -->
+    <script>
+        // API Key for OpenWeatherMap (replace with your own key)
+        const apiKey = 'd4c8088e25469279f51afae0e7304bd8'; // Get from https://openweathermap.org/api
+        
+        // Function to fetch weather data
+        async function fetchWeather(city) {
+            try {
+                // Show loading state
+                document.getElementById('locationName').textContent = "Loading...";
+                document.getElementById('weatherDesc').textContent = "Fetching data...";
+                
+                let apiUrl;
+                if (city === 'Prayagraj') {
+                    apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=25.4358&lon=81.8463&units=metric&appid=${apiKey}`;
+                } else {
+                    apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&units=metric&appid=${apiKey}`;
+                }
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.cod === 200) {
+                    updateWeatherUI(data);
+                    updateWeatherAdvice(data.weather[0].main, data.main.temp);
+                    fetchForecast(city); // Fetch forecast after current weather
+                } else {
+                    console.error('Weather data not found');
+                    document.getElementById('locationName').textContent = city;
+                    document.getElementById('weatherDesc').textContent = "Data unavailable";
+                }
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                document.getElementById('locationName').textContent = city;
+                document.getElementById('weatherDesc').textContent = "Error loading data";
+            }
+        }
+        
+        // Function to update weather UI
+        function updateWeatherUI(data) {
+            document.getElementById('locationName').textContent = data.name;
+            document.getElementById('temperature').textContent = Math.round(data.main.temp);
+            document.getElementById('feelsLike').textContent = Math.round(data.main.feels_like);
+            document.getElementById('humidity').textContent = data.main.humidity;
+            document.getElementById('windSpeed').textContent = Math.round(data.wind.speed * 3.6); // Convert m/s to km/h
+            document.getElementById('pressure').textContent = data.main.pressure;
+            document.getElementById('visibility').textContent = (data.visibility / 1000).toFixed(1); // Convert to km
+            document.getElementById('weatherDesc').textContent = data.weather[0].description;
+            
+            // Update weather icon
+            const icon = getWeatherIcon(data.weather[0].main, data.weather[0].description);
+            document.getElementById('weatherIcon').className = `fas fa-${icon}`;
+            
+            // Update date and time
+            const now = new Date();
+            document.getElementById('weatherDate').textContent = now.toLocaleDateString('en-IN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('updateTime').textContent = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Check for severe weather alerts
+            checkWeatherAlerts(data.weather[0].main, data.wind.speed, data.main.temp);
+        }
+        
+        // Function to get appropriate weather icon
+        function getWeatherIcon(weatherMain, description) {
+            const weatherIcons = {
+                'Clear': 'sun',
+                'Clouds': description.includes('few') ? 'cloud-sun' : 'cloud',
+                'Rain': description.includes('light') ? 'cloud-rain' : 'cloud-showers-heavy',
+                'Drizzle': 'cloud-rain',
+                'Thunderstorm': 'bolt',
+                'Snow': 'snowflake',
+                'Mist': 'smog',
+                'Smoke': 'smog',
+                'Haze': 'smog',
+                'Dust': 'smog',
+                'Fog': 'smog',
+                'Sand': 'smog',
+                'Ash': 'smog',
+                'Squall': 'wind',
+                'Tornado': 'poo-storm'
+            };
+            return weatherIcons[weatherMain] || 'cloud-sun';
+        }
+        
+        // Function to update weather advice
+        function updateWeatherAdvice(weather, temp) {
+            const adviceContainer = document.getElementById('weatherAdvice');
+            let adviceHTML = '';
+            
+            if (weather === 'Rain') {
+                adviceHTML = `
+                    <div class="advisory-item">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <p class="mb-0">Rain expected - postpone irrigation and protect sensitive crops</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <p class="mb-0">Good time for water-intensive crops</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-seedling text-info"></i>
+                        <p class="mb-0">Check drainage systems to prevent waterlogging</p>
+                    </div>
+                `;
+            } else if (temp > 35) {
+                adviceHTML = `
+                    <div class="advisory-item">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <p class="mb-0">High temperature - increase irrigation frequency</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <p class="mb-0">Ideal conditions for drying crops</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-bug text-danger"></i>
+                        <p class="mb-0">Monitor for increased pest activity</p>
+                    </div>
+                `;
+            } else if (temp < 10) {
+                adviceHTML = `
+                    <div class="advisory-item">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <p class="mb-0">Low temperature - protect sensitive plants from frost</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <p class="mb-0">Good for cold-resistant crops</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-tint text-primary"></i>
+                        <p class="mb-0">Reduce irrigation to prevent frost damage</p>
+                    </div>
+                `;
+            } else {
+                adviceHTML = `
+                    <div class="advisory-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <p class="mb-0">Good day for irrigation and fertilization</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <p class="mb-0">Ideal conditions for harvesting</p>
+                    </div>
+                    <div class="advisory-item">
+                        <i class="fas fa-tractor text-primary"></i>
+                        <p class="mb-0">Suitable for all outdoor farm activities</p>
+                    </div>
+                `;
+            }
+            
+            adviceContainer.innerHTML = adviceHTML;
+        }
+        
+        // Function to check for severe weather alerts
+        function checkWeatherAlerts(weather, windSpeed, temp) {
+            const alertBox = document.getElementById('weatherAlert');
+            
+            if (weather === 'Thunderstorm') {
+                document.getElementById('alertTitle').textContent = 'Thunderstorm Alert';
+                document.getElementById('alertMessage').textContent = 'Thunderstorms expected - secure equipment and protect livestock.';
+                alertBox.classList.remove('d-none');
+            } else if (windSpeed > 10) { // > 10 m/s (~36 km/h)
+                document.getElementById('alertTitle').textContent = 'High Wind Alert';
+                document.getElementById('alertMessage').textContent = 'High winds expected - secure loose items and protect delicate crops.';
+                alertBox.classList.remove('d-none');
+            } else if (temp > 38) {
+                document.getElementById('alertTitle').textContent = 'Heat Wave Alert';
+                document.getElementById('alertMessage').textContent = 'Extreme heat expected - increase irrigation and provide shade for sensitive plants.';
+                alertBox.classList.remove('d-none');
+            } else if (temp < 5) {
+                document.getElementById('alertTitle').textContent = 'Frost Alert';
+                document.getElementById('alertMessage').textContent = 'Freezing temperatures expected - protect sensitive plants from frost damage.';
+                alertBox.classList.remove('d-none');
+            } else {
+                alertBox.classList.add('d-none');
+            }
+        }
+        
+        // Function to fetch forecast (using OpenWeatherMap API)
+        async function fetchForecast(city) {
+            try {
+                let apiUrl;
+                if (city === 'Prayagraj') {
+                    apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=25.4358&lon=81.8463&units=metric&appid=${apiKey}`;
+                } else {
+                    apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city},IN&units=metric&appid=${apiKey}`;
+                }
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.cod === "200") {
+                    updateForecastUI(data);
+                } else {
+                    console.error('Forecast data not found');
+                    showMockForecast(); // Fallback to mock data
+                }
+            } catch (error) {
+                console.error('Error fetching forecast:', error);
+                showMockForecast(); // Fallback to mock data
+            }
+        }
+        
+        // Function to update forecast UI with real data
+        function updateForecastUI(data) {
+            const forecastContainer = document.getElementById('forecastContainer');
+            forecastContainer.innerHTML = '';
+            
+            // Group forecasts by day
+            const dailyForecasts = {};
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            data.list.forEach(item => {
+                const date = new Date(item.dt * 1000);
+                const dayKey = date.toLocaleDateString();
+                
+                if (!dailyForecasts[dayKey]) {
+                    dailyForecasts[dayKey] = {
+                        date: date,
+                        temps: [],
+                        weather: []
+                    };
+                }
+                
+                dailyForecasts[dayKey].temps.push(item.main.temp);
+                dailyForecasts[dayKey].weather.push(item.weather[0]);
+            });
+            
+            // Get all available days and limit to 7
+            let forecastDays = Object.keys(dailyForecasts);
+            if (forecastDays.length > 7) {
+                forecastDays = forecastDays.slice(0, 7);
+            }
+            
+            forecastDays.forEach((dayKey, index) => {
+                const dayData = dailyForecasts[dayKey];
+                const date = dayData.date;
+                const dayName = days[date.getDay()];
+                const dateStr = date.getDate() + '/' + (date.getMonth() + 1);
+                
+                // Calculate min/max temp
+                const maxTemp = Math.round(Math.max(...dayData.temps));
+                const minTemp = Math.round(Math.min(...dayData.temps));
+                
+                // Get most common weather condition
+                const weatherCounts = {};
+                dayData.weather.forEach(w => {
+                    const key = w.main;
+                    weatherCounts[key] = (weatherCounts[key] || 0) + 1;
+                });
+                const mostCommonWeather = Object.keys(weatherCounts).reduce((a, b) => 
+                    weatherCounts[a] > weatherCounts[b] ? a : b
+                );
+                const weatherIcon = getWeatherIcon(mostCommonWeather, '');
+                
+                forecastContainer.innerHTML += `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="forecast-card">
+                            <div class="forecast-day">${dayName}</div>
+                            <div class="forecast-date">${dateStr}</div>
+                            <div class="forecast-icon">
+                                <i class="fas fa-${weatherIcon}"></i>
+                            </div>
+                            <div class="forecast-temp">
+                                <span class="forecast-temp-high">${maxTemp}°</span> / 
+                                <span class="forecast-temp-low">${minTemp}°</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Fallback function to show mock forecast data
+        function showMockForecast() {
+            const forecastContainer = document.getElementById('forecastContainer');
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const now = new Date();
+            
+            forecastContainer.innerHTML = '';
+            
+            for (let i = 1; i <= 7; i++) {
+                const nextDate = new Date(now);
+                nextDate.setDate(now.getDate() + i);
+                const dayName = days[nextDate.getDay()];
+                const dateStr = nextDate.getDate() + '/' + (nextDate.getMonth() + 1);
+                const tempHigh = Math.floor(Math.random() * 5) + 25;
+                const tempLow = tempHigh - Math.floor(Math.random() * 3) - 2;
+                const weatherTypes = ['sun', 'cloud-sun', 'cloud', 'cloud-rain', 'cloud-showers-heavy'];
+                const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+                
+                forecastContainer.innerHTML += `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="forecast-card">
+                            <div class="forecast-day">${dayName}</div>
+                            <div class="forecast-date">${dateStr}</div>
+                            <div class="forecast-icon">
+                                <i class="fas fa-${randomWeather}"></i>
+                            </div>
+                            <div class="forecast-temp">
+                                <span class="forecast-temp-high">${tempHigh}°</span> / 
+                                <span class="forecast-temp-low">${tempLow}°</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize weather for default city
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchWeather('Delhi');
+            
+            // Add event listener for city select
+            document.getElementById('citySelect').addEventListener('change', function() {
+                const selectedCity = this.value === 'Prayagraj' ? 'Allahabad' : this.value;
+                fetchWeather(selectedCity);
+            });
+        });
+    </script>
+    <h6>Dev: Er.Abhishek Prajapati</h6>
+</body>
+</html>
